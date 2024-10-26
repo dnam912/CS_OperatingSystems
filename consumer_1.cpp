@@ -42,25 +42,6 @@ int n = 2;
 //mutex consumer_mutex;
 queue<int> bounded_buffer;
 
-void produce() {
-    do {
-        /*
-        wait(empty); // wait until empty > 0 and decrement empty
-        wait(_mutex_); // acquire lock
-         // produce data from buffer
-
-        signal(_mutex_); // release lock
-        signal(full); // increment full
-        */
-
-       int n = 2;
-
-        std::this_thread::sleep_for (std::chrono::seconds(n));
-        std::cout << "pause of " << n << " seconds ended\n";
-       
-    } while (true);
-}
-
 void consume(int n) {
     do {
         /*

@@ -1,0 +1,24 @@
+
+# $ gcc producer.c -pthread -lrt -o producer
+# $ gcc consumer.c -pthread -lrt -o consumer
+# $ ./producer & ./consumer &
+
+
+
+
+
+
+g++ producer_ps.cpp -pthread -lrt -o producer_ps
+g++ consumer_ps.cpp -pthread -lrt -o consumer_ps
+./producer_ps & ./consumer_ps &
+
+
+
+
+
+
+
+
+
+
+
