@@ -1,0 +1,26 @@
+1.
+top
+: Check all activating processes on the computer
+
+
+2. 
+
+: While parent PID and child PID is running together
+ps
+ps aux | grep (child PID)
+
+ps commandlines are checking child PID
+
+
+linuxubuntu@LinuxUbuntu:~$ ps
+    PID TTY          TIME CMD
+   5266 pts/1    00:00:00 bash
+   5608 pts/1    00:00:00 ps
+
+linuxubuntu@LinuxUbuntu:~$ ps aux | grep 5331
+linuxub+    5331  0.0  0.0   6436  3316 pts/0    S+   16:34   0:00 ./a.out
+linuxub+    5628  0.0  0.0   2864  1520 ?        S    16:36   0:00 /bin/sh -c "/snap/code/172/usr/share/code/resources/app/out/vs/base/node/cpuUsage.sh" 4303 5331
+linuxub+    5629  0.0  0.0  18700  3680 ?        S    16:36   0:00 /bin/bash /snap/code/172/usr/share/code/resources/app/out/vs/base/node/cpuUsage.sh 4303 5331
+linuxub+    5635  0.0  0.0  17888  2272 pts/1    S+   16:36   0:00 grep --color=auto 5331
+
+5331 is child PID here
