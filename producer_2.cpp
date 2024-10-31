@@ -1,54 +1,47 @@
 #include <iostream>
 #include <queue>
 #include <mutex>
-#include <condition_variable> // Add
 
+#include <semaphore.h>
 #include <sys/mman.h>
 #include <sys/stat.h>        /* For mode constants */
 #include <fcntl.h>           /* For O_* constants */
-
 #include <unistd.h>
-#include <semaphore.h>
 
-        #include <ctype.h>
-        #include <stdio.h>
-        #include <stdlib.h>
+#include <condition_variable> // Add
 
 using namespace std;
 
 
-// mutex mtx;
-// condition_variable cv; 
-
-
 // BOUNDED BUFFER
 const char* SHARED_MEM_NAME = "/my_shared_memory";
-const int BUFFER_SIZE = 5;
+const int BUFFER_SIZE = 2; // The table can only hold two items at the same time.
 int index_counter;
 
 struct SharedMemory {
-    queue<int> bounded_buffer;
-    sem_t mutex, full, empty
+    // queue<int> buffer;
+    int buffer[BUFFER_SIZE];
+    int counter = 0;
+    int producer_in = 0;
 }
 
-
 // SEMAPHORES
+// int shm_open(const char *name, int oflag, mode_t mode);
+// int shm_unlink(const char *name);
+sem_t mutex, full, empty
 int pshared = 1;
-// const unsigned int semaphore_value;
 
 
 void produce() {
-    // int shm_open(const char *name, int oflag, mode_t mode);
-    // int shm_unlink(const char *name);
-
     // Create shared memory object
-    int shm_fd = shm_open(SHARED_MEM_NAME, O_CREAT | O_RDWR, 0666);
+    int shm_object = shm_open(SHARED_MEM_NAME, O_CREAT | O_RDWR, 0666);
     
     // Decide the size of shared mem.
-    ftruncate(shm_fd, 1024);
+    // ftruncate(shm_object, 1024);
 
     // Map the shared_mem object into the process's address space
-    SharedMemoryr* SHARED_MEM = (SharedMemory*)mmap(0, sizeof(SharedMemory), PROT_READ | PROT_WRITE, MAP_SHARED, shm_fd, 0);
+    SharedMemoryr* SHARED_MEM = (SharedMemory*)mmap(0, sizeof(SharedMemory), PROT_READ | PROT_WRITE, MAP_SHARED, shm_object, 0);
+
 
     /* 
     INITIALIZE SEMAPHORES
@@ -74,12 +67,13 @@ void produce() {
 
 
         munmap(sharedBuffer, sizeof(SharedBuffer));
-        close(shm_fd);
+        close(shm_object);
 
     } while (true);
 }
 
 int main() {
+
     // Fork to create processes (producer & consumer)
     pid_t pid = fork();
 
@@ -90,8 +84,6 @@ int main() {
     */
 
     if (pid == 0) {
-        // Produce 2 items
-        produce(2);
         return 0;
     } else if (pid > 0) {
         wait(NULL);

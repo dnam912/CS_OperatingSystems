@@ -46,7 +46,7 @@ void producer(int n) {
 int main() {
     pid_t pid = fork();
     if (pid == 0) {
-        producer(20);  // Produce 20 items
+        producer(2);  // Produce 20 items
         return 0;
     } else if (pid > 0) {
         wait(NULL);
