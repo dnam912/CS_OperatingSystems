@@ -62,7 +62,7 @@ void produce() {
         // cout << "DEBUG_1: Assign i into 'buffer[producer_in]" << endl;
         SHARED_MEM->buffer[SHARED_MEM->producer_in] = i;
 
-        cout << "Produced: " << SHARED_MEM->buffer[SHARED_MEM->producer_in] << endl;*/
+        cout << "Produced: " << SHARED_MEM->buffer[SHARED_MEM->producer_in] << endl;
             
         SHARED_MEM->index_counter++; // Increment counter of current buffer index
 
