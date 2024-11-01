@@ -29,8 +29,6 @@ struct SharedMemory {
     int index_counter;
     int consumer_out; // Items for consumer
 
-    int producer_in;
-
     // INITIALIZE SEMAPHORES
     sem_t mutex, full, empty;
 };
@@ -51,40 +49,40 @@ void consume() {
 
     // Assign zero in variables of SHARED MEM
     SHARED_MEM->index_counter = 0;
-    SHARED_MEM->producer_in = 0; // Produce an item in the buffer
+    SHARED_MEM->consumer_out = 0; // Without initializing consumer_out, it causes seg fault
 
     // INITIALIZE SEMAPHORES: sem_init(sem_t *sem, int pshared, unsigned value);
     sem_init(&SHARED_MEM->mutex, pshared, 1);           // sem_mutex initialized to value 1 (binary semaphore)
     sem_init(&SHARED_MEM->full, pshared, 0);            // sem_full initailzied to value 0 (counting semaphore)
     sem_init(&SHARED_MEM->empty, pshared, BUFFER_SIZE); // sem_empty initialized to value n (counting sempaphore)
     
-
+    
     // PRODUCER
     for (int i = 0; i < BUFFER_SIZE; i++) {
-        cout << "DEBUG_1: Assign i into 'buffer[producer_in]" << endl;
-        SHARED_MEM->buffer[SHARED_MEM->producer_in] = i;
+        cout << "DEBUG_1(producer)" << endl;
+        SHARED_MEM->buffer[SHARED_MEM->consumer_out] = i;
 
-        cout << "Produced: " << SHARED_MEM->buffer[SHARED_MEM->producer_in] << endl;
-            
-        SHARED_MEM->index_counter++; // Increment counter of current buffer index
+        cout << "Produced: " << SHARED_MEM->buffer[SHARED_MEM->consumer_out] << endl;
+
+        SHARED_MEM->index_counter++;    // Increment counter of current buffer index
+                                        // index_counter == 2;
     }
+    cout << endl;
     
-    // CONSUMER
-    // for (int i = SHARED_MEM->index_counter; i >= 0; i++) {
-    for (int i = BUFFER_SIZE; i >= 0; i--) {
-        // item = SHARED_MEM->buffer[SHARED_MEM->consumer_out];
 
-        item = SHARED_MEM->buffer[SHARED_MEM->index_counter];
-        cout << "Consumed: " << item << endl;
+    // CONSUMER
+    for (int i = (BUFFER_SIZE - 1); i >= 0; i--) {
+        cout << "DEBUG_2(consumer)" << endl;
+        int item = SHARED_MEM->buffer[SHARED_MEM->consumer_out];    // Consume an item from the buffer
+
+        cout << "Consumed: " << item << endl;                       // item == 1;
+
+        SHARED_MEM->consumer_out = (SHARED_MEM->consumer_out - 1 + BUFFER_SIZE) % BUFFER_SIZE;
+        cout << "consumer_out: " << SHARED_MEM->consumer_out << endl; // consumer_out == 1;
 
         SHARED_MEM->index_counter--;
+        cout << "index_counter: " << SHARED_MEM->index_counter << endl;
     }
-    /*
-    Result: 
-    Consumed: 2
-    Consumed: 0
-    Consumed: 1
-    */
 
     // DESTROY ASSIGNED SEMAPHORES
     sem_destroy(&SHARED_MEM->mutex);
@@ -99,6 +97,7 @@ void consume() {
     shm_unlink(SHARED_MEM_NAME);
 }
 
+
     /*do {  
             wait(full); // wait until full > 0 and decrement full
             wait(mutex); // acquire lock
@@ -111,10 +110,24 @@ void consume() {
             // consume data from buffer
             
 
-        } while (true); */
+        } while (true);
+    */
 
 int main() {
     consume();
+
+    /*
+    pid_t pid = fork();
+
+    if (pid == 0) {
+        consume();
+        return 0;
+    } else if (pid > 0) {
+        wait(NULL);
+    } else {
+        cerr << "Fork failed" << endl;
+        return 1;
+    }*/
 
     return 0;
 }
