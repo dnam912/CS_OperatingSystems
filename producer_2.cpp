@@ -8,8 +8,10 @@
 #include <sys/mman.h>
 #include <sys/stat.h>        /* For mode constants */
 #include <fcntl.h>           /* For O_* constants */
-#include <unistd.h>
 // #include <condition_variable> // Add
+
+#include <unistd.h>    // Needed for fork
+#include <sys/wait.h>  // Needed for wait
 
 using namespace std;
 
@@ -46,7 +48,7 @@ void produce() {
 
     // Assign zero in variables of SHARED MEM
     SHARED_MEM->index_counter = 0;
-    SHARED_MEM->producer_in = 0;
+    SHARED_MEM->producer_in = 0; // Produce an item in the buffer
 
     // INITIALIZE SEMAPHORES: sem_init(sem_t *sem, int pshared, unsigned value);
     sem_init(&SHARED_MEM->mutex, pshared, 1);           // sem_mutex initialized to value 1 (binary semaphore)
@@ -70,9 +72,12 @@ void produce() {
     // REMOVE THE MAP CONTAINING THE ADDRESS SPACE OF PROCESS
     munmap(&SHARED_MEM, sizeof(SharedMemory)); 
 
-
-    // do {
-        /*
+    // UNLINK SHARED MEMORY OBJECT
+    // int shm_unlink(const char *name);
+    shm_unlink(SHARED_MEM_NAME);
+    
+ /*
+    do {
         // produce an item //
 
         wait(empty);
@@ -82,12 +87,13 @@ void produce() {
 
         signal(mutex);
         signal(full);
-        */
-    // } while (true);
-
+      
+    } while (true);
+*/
 }
 
 int main() {
+    /*
     produce();
     cout << "DEBUG_2: producer()" << endl;
     
@@ -95,17 +101,16 @@ int main() {
     // int shm_unlink(const char *name);
     shm_unlink(SHARED_MEM_NAME);
     cout << "DEBUG_3: shm_unlink" << endl;
-
+    */
 
     // Fork to create processes (producer & consumer)
-    // pid_t pid = fork();
+    pid_t pid = fork();
     /* PROCESSES
             (pid)
             /   \
     (producer)  (consumer)
     */
-
-    /*
+    
     if (pid == 0) {
         produce();
         return 0;
@@ -114,7 +119,7 @@ int main() {
     } else {
         cerr << "Fork failed" << endl;
         return 1;
-    }*/
+    }
 
     return 0;
 }
