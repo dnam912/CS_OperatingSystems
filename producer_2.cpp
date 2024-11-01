@@ -55,7 +55,7 @@ void produce() {
     sem_init(&SHARED_MEM->full, pshared, 0);            // sem_full initailzied to value 0 (counting semaphore)
     sem_init(&SHARED_MEM->empty, pshared, BUFFER_SIZE); // sem_empty initialized to value n (counting sempaphore)
 
-    for (int i = 0; i < 2; i++) {
+    for (int i = 0; i < BUFFER_SIZE; i++) {
         cout << "DEBUG_1: Assign i into 'buffer[producer_in]" << endl;
         SHARED_MEM->buffer[SHARED_MEM->producer_in] = i;
 
@@ -75,7 +75,7 @@ void produce() {
     // UNLINK SHARED MEMORY OBJECT
     // int shm_unlink(const char *name);
     shm_unlink(SHARED_MEM_NAME);
-    
+
  /*
     do {
         // produce an item //
