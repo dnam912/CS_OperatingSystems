@@ -79,6 +79,12 @@ void consume() {
 
         SHARED_MEM->index_counter--;
     }
+    /*
+    Result: 
+    Consumed: 2
+    Consumed: 0
+    Consumed: 1
+    */
 
     // DESTROY ASSIGNED SEMAPHORES
     sem_destroy(&SHARED_MEM->mutex);
@@ -109,23 +115,6 @@ void consume() {
 
 int main() {
     consume();
-    /*
-    // Fork to create processes (producer & consumer)
-    pid_t pid = fork();
-        PROCESSES
-            (pid)
-            /   \
-    (producer)  (consumer)
-    
-    if (pid == 0) {
-        consume();
-        return 0;
-    } else if (pid > 0) {
-        wait(NULL);
-    } else {
-        cerr << "Fork failed" << endl;
-        return 1;
-    }*/
 
     return 0;
 }
