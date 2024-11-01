@@ -56,12 +56,19 @@ void produce() {
     sem_init(&SHARED_MEM->empty, pshared, BUFFER_SIZE); // sem_empty initialized to value n (counting sempaphore)
 
     for (int i = 0; i < BUFFER_SIZE; i++) {
+        sem_wait(&SHARED_MEM->empty);  // Wait if buffer is full
+        sem_wait(&SHARED_MEM->mutex);  // Lock mutex
+
+        /*
         cout << "DEBUG_1: Assign i into 'buffer[producer_in]" << endl;
         SHARED_MEM->buffer[SHARED_MEM->producer_in] = i;
 
-        cout << "Produced: " << SHARED_MEM->buffer[SHARED_MEM->producer_in] << endl;
+        cout << "Produced: " << SHARED_MEM->buffer[SHARED_MEM->producer_in] << endl;*/
             
         SHARED_MEM->index_counter++; // Increment counter of current buffer index
+
+        sem_post(&SHARED_MEM->mutex); // Unlock mutex
+        sem_post(&SHARED_MEM->full);  // Signal that buffer has an item
     }
 
     // DESTROY ASSIGNED SEMAPHORES
@@ -93,23 +100,14 @@ void produce() {
 }
 
 int main() {
-    /*
-    produce();
-    cout << "DEBUG_2: producer()" << endl;
-    
-    // UNLINK SHARED MEMORY OBJECT
-    // int shm_unlink(const char *name);
-    shm_unlink(SHARED_MEM_NAME);
-    cout << "DEBUG_3: shm_unlink" << endl;
-    */
-
-    // Fork to create processes (producer & consumer)
-    pid_t pid = fork();
     /* PROCESSES
             (pid)
             /   \
     (producer)  (consumer)
     */
+
+    // Fork to create processes (producer & consumer)
+    pid_t pid = fork();
     
     if (pid == 0) {
         produce();

@@ -56,8 +56,8 @@ void consume() {
     sem_init(&SHARED_MEM->full, pshared, 0);            // sem_full initailzied to value 0 (counting semaphore)
     sem_init(&SHARED_MEM->empty, pshared, BUFFER_SIZE); // sem_empty initialized to value n (counting sempaphore)
     
-    
-    // PRODUCER
+
+    /* // PRODUCER
     for (int i = 0; i < BUFFER_SIZE; i++) {
         cout << "DEBUG_1(producer)" << endl;
         SHARED_MEM->buffer[SHARED_MEM->consumer_out] = i;
@@ -67,21 +67,25 @@ void consume() {
         SHARED_MEM->index_counter++;    // Increment counter of current buffer index
                                         // index_counter == 2;
     }
-    cout << endl;
-    
+    cout << endl; */
 
     // CONSUMER
     for (int i = (BUFFER_SIZE - 1); i >= 0; i--) {
-        cout << "DEBUG_2(consumer)" << endl;
-        int item = SHARED_MEM->buffer[SHARED_MEM->consumer_out];    // Consume an item from the buffer
+        sem_wait(&SHARED_MEM->full);
+        sem_wait(&SHARED_MEM->mutex);
 
+        // cout << "DEBUG_2(consumer)" << endl;
+        int item = SHARED_MEM->buffer[SHARED_MEM->consumer_out];    // Consume an item from the buffer
         cout << "Consumed: " << item << endl;                       // item == 1;
 
         SHARED_MEM->consumer_out = (SHARED_MEM->consumer_out - 1 + BUFFER_SIZE) % BUFFER_SIZE;
-        cout << "consumer_out: " << SHARED_MEM->consumer_out << endl; // consumer_out == 1;
-
+        // cout << "consumer_out: " << SHARED_MEM->consumer_out << endl; // consumer_out == 1;
+        
+        // cout << "index_counter: " << SHARED_MEM->index_counter << endl;
         SHARED_MEM->index_counter--;
-        cout << "index_counter: " << SHARED_MEM->index_counter << endl;
+
+        sem_post(&SHARED_MEM->mutex);
+        sem_post(&SHARED_MEM->empty);
     }
 
     // DESTROY ASSIGNED SEMAPHORES
@@ -114,9 +118,8 @@ void consume() {
     */
 
 int main() {
-    consume();
+    // consume();
 
-    /*
     pid_t pid = fork();
 
     if (pid == 0) {
@@ -127,7 +130,7 @@ int main() {
     } else {
         cerr << "Fork failed" << endl;
         return 1;
-    }*/
+    }
 
     return 0;
 }
