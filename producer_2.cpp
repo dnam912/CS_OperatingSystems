@@ -69,6 +69,8 @@ void produce() {
 
         sem_post(&SHARED_MEM->mutex); // Unlock mutex
         sem_post(&SHARED_MEM->full);  // Signal that buffer has an item
+
+        sleep(1);
     }
 
     // DESTROY ASSIGNED SEMAPHORES

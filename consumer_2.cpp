@@ -86,6 +86,8 @@ void consume() {
 
         sem_post(&SHARED_MEM->mutex);
         sem_post(&SHARED_MEM->empty);
+
+        sleep(2);
     }
 
     // DESTROY ASSIGNED SEMAPHORES
