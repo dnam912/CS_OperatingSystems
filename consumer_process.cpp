@@ -52,9 +52,9 @@ void Consume() {
 
     // INITIALIZE SEMAPHORES
     // :  sem_init(sem_t *sem, int pshared, unsigned value);
-    sem_init(&SHARED_MEM->mutex, pshared, 1);           // sem_mutex initialized to value 1 (binary semaphore)
-    sem_init(&SHARED_MEM->full, pshared, 0);            // sem_full initailzied to value 0 (counting semaphore)
-    sem_init(&SHARED_MEM->empty, pshared, BUFFER_SIZE); // sem_empty initialized to value n (counting sempaphore)
+    // sem_init(&SHARED_MEM->mutex, pshared, 1);           // sem_mutex initialized to value 1 (binary semaphore)
+    // sem_init(&SHARED_MEM->full, pshared, 0);            // sem_full initailzied to value 0 (counting semaphore)
+    // sem_init(&SHARED_MEM->empty, pshared, BUFFER_SIZE); // sem_empty initialized to value n (counting sempaphore)
 
 
     /* PSEUDO CODE FOR CONSUMER
@@ -93,20 +93,24 @@ void Consume() {
 
 
     // DESTROY ASSIGNED SEMAPHORES
-    sem_destroy(&SHARED_MEM->mutex);
-    sem_destroy(&SHARED_MEM->full);
-    sem_destroy(&SHARED_MEM->empty);
+    // sem_destroy(&SHARED_MEM->mutex);
+    // sem_destroy(&SHARED_MEM->full);
+    // sem_destroy(&SHARED_MEM->empty);
 
     // REMOVE THE MAP CONTAINING THE ADDRESS SPACE OF PROCESS
-    munmap(&SHARED_MEM, sizeof(SharedMemory)); 
+    // munmap(&SHARED_MEM, sizeof(SharedMemory)); 
 
     /* DO NOT UNLINK SHARED MEMORY OBJECT IN CONSUMER.CPP.
         OR PRODUCER AND CONSUMER WILL NOT INTERACT */
+    shm_unlink(SHARED_MEM_NAME);
+    // because of unmapping before, there might be some issues when unlinking shared memory object in the consumer.cpp
 }
 
 int main() {
+    Consume();
+
     // Fork to create process 2
-    pid_t pid = fork();
+    // pid_t pid = fork();
 
     /*    PROCESSES
             (pid)
@@ -114,6 +118,7 @@ int main() {
     (producer)  (consumer)
     */
 
+    /*
     if (pid == 0) {
         Consume();
         return 0;
@@ -122,7 +127,7 @@ int main() {
     } else {
         cerr << "Fork failed" << endl;
         return 1;
-    }
+    } */
 
     return 0;
 }

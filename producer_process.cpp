@@ -87,12 +87,12 @@ void Produce() {
 
 
     // DESTROY ASSIGNED SEMAPHORES
-    sem_destroy(&SHARED_MEM->mutex);
-    sem_destroy(&SHARED_MEM->full);
-    sem_destroy(&SHARED_MEM->empty);
+    // sem_destroy(&SHARED_MEM->mutex);
+    // sem_destroy(&SHARED_MEM->full);
+    // sem_destroy(&SHARED_MEM->empty);
 
     // REMOVE THE MAP CONTAINING THE ADDRESS SPACE OF PROCESS
-    munmap(&SHARED_MEM, sizeof(SharedMemory)); 
+    // munmap(&SHARED_MEM, sizeof(SharedMemory)); 
 
     // UNLINK SHARED MEMORY OBJECT
     // :  int shm_unlink(const char *name);
@@ -100,14 +100,13 @@ void Produce() {
 }
 
 int main() {
+    Produce();
+
     // Fork to create process 1
+
+    /* 
     pid_t pid = fork();
 
-    /*    PROCESSES
-            (pid)
-            /   \
-    (producer)  (consumer)
-    */
     
     if (pid == 0) {
         Produce();
@@ -118,6 +117,8 @@ int main() {
         cerr << "Fork failed" << endl;
         return 1;
     }
+    */
+
 
     return 0;
 }
