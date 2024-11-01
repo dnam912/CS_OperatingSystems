@@ -58,9 +58,8 @@ void produce() {
     for (int i = 0; i < BUFFER_SIZE; i++) {
         sem_wait(&SHARED_MEM->empty);  // Wait if buffer is full
         sem_wait(&SHARED_MEM->mutex);  // Lock mutex
-
-        /*
-        cout << "DEBUG_1: Assign i into 'buffer[producer_in]" << endl;
+        
+        // cout << "DEBUG_1: Assign i into 'buffer[producer_in]" << endl;
         SHARED_MEM->buffer[SHARED_MEM->producer_in] = i;
 
         cout << "Produced: " << SHARED_MEM->buffer[SHARED_MEM->producer_in] << endl;*/
