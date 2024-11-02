@@ -102,23 +102,17 @@ void Consume() {
 
     /* DO NOT UNLINK SHARED MEMORY OBJECT IN CONSUMER.CPP.
         OR PRODUCER AND CONSUMER WILL NOT INTERACT */
-    shm_unlink(SHARED_MEM_NAME);
-    // because of unmapping before, there might be some issues when unlinking shared memory object in the consumer.cpp
+    shm_unlink(SHARED_MEM_NAME);    // because of unmapping before,
+                                    // there might be some issues when unlinking shared memory object in the consumer.cpp
 }
+
 
 int main() {
     Consume();
 
-    // Fork to create process 2
-    // pid_t pid = fork();
-
-    /*    PROCESSES
-            (pid)
-            /   \
-    (producer)  (consumer)
-    */
-
     /*
+    // Fork to create process
+    pid_t pid = fork();
     if (pid == 0) {
         Consume();
         return 0;

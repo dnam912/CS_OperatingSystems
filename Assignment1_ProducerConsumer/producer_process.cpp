@@ -102,12 +102,9 @@ void Produce() {
 int main() {
     Produce();
 
-    // Fork to create process 1
-
     /* 
+    // Fork to create process
     pid_t pid = fork();
-
-    
     if (pid == 0) {
         Produce();
         return 0;
@@ -116,9 +113,7 @@ int main() {
     } else {
         cerr << "Fork failed" << endl;
         return 1;
-    }
-    */
-
+    } */
 
     return 0;
 }
