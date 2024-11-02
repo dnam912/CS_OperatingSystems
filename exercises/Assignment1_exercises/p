@@ -1,0 +1,4 @@
+g++ producer_p.cpp -pthread -lrt -o producer_p
+g++ consumer_p.cpp -pthread -lrt -o consumer_p
+
+./producer_p & ./consumer_p

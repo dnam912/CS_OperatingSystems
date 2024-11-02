@@ -1,0 +1,4 @@
+g++ producer_revised.cpp -pthread -lrt -o producer_revised
+g++ consumer_revised.cpp -pthread -lrt -o consumer_revised
+
+./producer_revised & ./consumer_revised
