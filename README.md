@@ -1,3 +1,3 @@
-CS 33211 - Operating Systems
+# CS 33211 - Operating Systems
 
-Fall 2024
+Operating Systems in Fall 2024
