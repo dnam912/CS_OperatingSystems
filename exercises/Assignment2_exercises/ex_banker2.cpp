@@ -1,11 +1,14 @@
 #include <iostream>
-#include <vector>
 #include <string>
+#include <queue>
+#include <vector>
 #include <fstream>
 #include <sstream>
 
 using namespace std;
 
+int ROW = 5;
+int COLUMN = 3;
 
 int allocation[5][3] = {{-1,-1,-1}, {-1,-1,-1}, {-1,-1,-1}, {-1,-1,-1}, {-1,-1,-1}};
 int maximum[5][3] = {{-1,-1,-1}, {-1,-1,-1}, {-1,-1,-1}, {-1,-1,-1}, {-1,-1,-1}};
@@ -13,7 +16,7 @@ int avail_initial_value[3] = {-1, -1, -1};
 int available[5][3] =  {{-1,-1,-1}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0}};
 int need[5][3] = {{-1,-1,-1}, {-1,-1,-1}, {-1,-1,-1}, {-1,-1,-1}, {-1,-1,-1}};
 
-vector<int> processes_queue;
+queue<int> process_queue;
 
 
 int readInputFile() {
@@ -50,17 +53,49 @@ int readInputFile() {
     return 0;
 }
 
-void calculate_need() {
-    for (int i = 0; i < 5; i++) {
-        for (int j = 0; j < 3; j++) {
+void calculateNeed() {
+    for (int i = 0; i < ROW; i++) {
+        for (int j = 0; j < COLUMN; j++) {
             need[i][j] = maximum[i][j] - allocation[i][j];
         }
     }
 }
 
+// ========== ========== ========== ========== ========== //
+
+void initializeProcess() {
+    for (int i = 0; i < ROW; i++) {
+        process_queue.push(i);
+    }
+}
+
+void printQueue(queue<int> process) {
+    while(!process.empty()) {
+        cout << "P"<< process.front() << endl;
+        process.pop();
+    }
+    cout << endl;
+}
+
+// ========== ========== ========== ========== ========== //
+
+void buildBankersAlgorithm() {
+    /*
+    if (available > need) {
+        executeProcess() // pop & print
+        proces_counter = 0;
+        available += allocation[][]
+    } else {
+        process_counter++;
+    }
+    */
+}
+
+// ========== ========== ========== ========== ========== //
+
 void printInitialAvailable() {
     cout << "Initial Available: ";
-    for (int i = 0; i < 3; i++) {
+    for (int i = 0; i < COLUMN; i++) {
         available[0][i] = avail_initial_value[i];
         cout << avail_initial_value[i] << " ";
     }
@@ -71,7 +106,7 @@ struct ABC {int A = 0; int B = 0; int C = 0;};
 void printTotalResources() {
     // ALLOCATION + AVAILABLE
     ABC resources;
-    for (int i = 0; i < 5; i++) {
+    for (int i = 0; i < ROW; i++) {
         resources.A += allocation[i][0];
         resources.B += allocation[i][1];
         resources.C += allocation[i][2];
@@ -93,32 +128,34 @@ void printTable() {
 
     // ROW
     cout << "Allocation - Maximum - Available - Need" << endl;
-    for (int i = 0; i < 5; i++) {
+    for (int i = 0; i < ROW; i++) {
 
         cout << "P" << i << ":  ";
 
         // COLUMN
-        for (int j = 0; j < 3; j++) {
+        for (int j = 0; j < COLUMN; j++) {
             cout << allocation[i][j] << " ";
         }
 
         cout << "-  ";
-        for (int k = 0; k < 3; k++) {
+        for (int k = 0; k < COLUMN; k++) {
             cout << maximum[i][k] << " ";
         }
         
         cout << " -   ";
-        for (int m = 0; m < 3; m++) {
+        for (int m = 0; m < COLUMN; m++) {
             cout << available[i][m] << " ";
         }
 
         cout << "  - ";
-        for (int n = 0; n < 3; n++) {
+        for (int n = 0; n < COLUMN; n++) {
             cout << need[i][n] << " ";
         }
 
         cout << endl;
     }
+    cout << endl;
+
 }
 
 
@@ -134,8 +171,11 @@ int writeOutputFile() {
 int main() {
 
     readInputFile();
-    calculate_need();
+    initializeProcess();
+    calculateNeed();
+    
     printTable();
+    printQueue(process_queue);
 
     return 0;
 
