@@ -1,9 +1,7 @@
 CS 33211 - Operating Systems
 
 
-ASSIGNMENT 2 - ENTER EACH OF THESE COMMAND LINES IN THE TERMINAL: 
+ASSIGNMENT 2 - ENTER THIS COMMAND IN THE TERMINAL: 
 
-g++ producer_process.cpp -pthread -lrt -o producer_process
-g++ consumer_process.cpp -pthread -lrt -o consumer_process
 
-./producer_process & ./consumer_process
+g++ -std=c++17 ex_banker2.cpp; ./a.out
