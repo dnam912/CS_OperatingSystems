@@ -1,93 +1,167 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <fstream>
+#include <sstream>
+#include <cstdio>
 
 using namespace std;
 
-// Banker’s Algorithm for deadlock avoidance.
+int ROW = 5;
+int COLUMN = 3;
 
-/*
-Considering a system with five processes P0 through P4 and three resources 
-of type A, B, C. Resource type A has 10 instances, B has 5 instances and 
-type C has 7 instances. Suppose at time t0 following snapshot of the system 
-has been taken:
+int available[3] = {-1, -1, -1};
+int allocation[5][3] = {{-1,-1,-1}, {-1,-1,-1}, {-1,-1,-1}, {-1,-1,-1}, {-1,-1,-1}};
+int maximum[5][3] = {{-1,-1,-1}, {-1,-1,-1}, {-1,-1,-1}, {-1,-1,-1}, {-1,-1,-1}};
+int need[5][3] = {{-1,-1,-1}, {-1,-1,-1}, {-1,-1,-1}, {-1,-1,-1}, {-1,-1,-1}};
 
-Implement the Banker’s algorithm to answer the following question： 
-Is the system in a safe state? If Yes, then what is the safe sequence?
-
-Input file (you should create an input file, e.g., .txt, with your customized 
-format that stores the data that is provided in the table).  
-Your code should print out the safe sequence if the system is safe.
-*/
+vector<int> process_queue;
 
 
-
-/* vector<vector<int>>& allocation(int row, int column) {
-
-    row = 5;
-    column = 3;
-    static vector<vector<int>> matrices;
-    
-    for (int i = 0; i < column; i++) {
-        for (int j = 0; j < row; j++) {
-            matrices[j].push_back(allocationA);
-        }
+int readInputFile() {
+    ifstream input("input.txt");
+    if (!input.is_open()) {
+        cerr << "ERROR: File cannot be opened" << endl;
+        return -1;
     }
 
+    int row_number = -1;
+    string row;
+    while (getline(input, row)) {
+        int number1, number2, number3, number4, number5, number6;
+        istringstream iss(row);
+        iss >> number1 >> number2 >> number3 >> number4 >> number5 >> number6;
 
-    return matrices;
-} */
-
-
-// PRINT TABLE
-const int row = 5;
-const int column = 3;
-
-int resources_allocation[5][3] = {{0,1,0}, {2,0,0}, {3,0,2}, {2,1,1}, {0,0,2}};
-int resources_max[5][3] = {{7,5,3}, {3,2,2}, {9,0,2}, {2,2,2}, {4,3,3}};
-int resources_available[row][column];
-
-
-// PRINT STATES
-int processes[5];
-string safety[2] = {"Safe", "Unsafe"};
-
-
-void PrintArrays() {
-    
-    cout << "Prints Allocation" << endl;
-    for (int i = 0; i < row; i++) {
-        for (int j = 0; j < column; j++) {
-            cout << resources_allocation[i][j] << " ";
+        if (row_number == -1) {
+            available[0] = number1;
+            available[1] = number2;
+            available[2] = number3;
+        } else {
+            allocation[row_number][0] = number1;
+            allocation[row_number][1] = number2;
+            allocation[row_number][2] = number3;
+            maximum[row_number][0] = number4;
+            maximum[row_number][1] = number5;
+            maximum[row_number][2] = number6;
         }
-        cout << endl;
+        
+        row_number++;
     }
 
-    cout << "Prints Max" << endl;
-    for (int i = 0; i < row; i++) {
-        for (int j = 0; j < column; j++) {
-            cout << resources_max[i][j] << " ";
-        }
-        cout << endl;
-    }
-
-
-    /*
-    cout << "Prints Available" << endl;
-    for (int i = 0; i < row; i++) {
-        for (int j = 0; j < column; j++) {
-            // cout << allocation[i][j] << " ";
-        }
-        cout << endl;
-    }*/
-
+    input.close();
+    return 0;
 }
+
+void calculateNeed() {
+    for (int i = 0; i < ROW; i++) {
+        for (int j = 0; j < COLUMN; j++) {
+            need[i][j] = maximum[i][j] - allocation[i][j];
+        }
+    }
+}
+
+void initializeProcessQueue() {
+    for (int i = 0; i < 5; i++) {
+        // If process is in queue, it is not executed.
+        process_queue.push_back(i); 
+
+        cout << "P" << i << " ";
+    } cout << endl;
+}
+
+bool isExecutable(int process_number) {  // (available > need)
+    for (int i = 0; i < COLUMN; i++) {
+        if (available[i] > need[process_number][i]) {
+            return true;
+        }
+    }
+    return false;
+}
+
+
+void executeProcess(int process_number) {
+
+    cout << "Executing: P" << process_number << endl;
+
+    for (int i = 0; i < 3; i++) {
+        available[i] = allocation[process_number][i] + available[i];
+        allocation[process_number][i] = 0;
+    }
+
+    process_queue.erase(
+        //vector<int> iterator it = process_queue;
+        remove(process_queue.begin(), process_queue.end(), process_number), 
+        process_queue.end()
+    );
+}
+
+
+// ========== ========== ========== ========== ========== //
+
+struct ABC {int A = 0; int B = 0; int C = 0;};
+void printTotalResources() {
+    // ALLOCATION + AVAILABLE
+    ABC resources;
+    for (int i = 0; i < ROW; i++) {
+        resources.A += allocation[i][0];
+        resources.B += allocation[i][1];
+        resources.C += allocation[i][2];
+    }
+
+    resources.A += available[0];
+    resources.B += available[1];
+    resources.C += available[2];
+    
+    cout << "Total Resources: " << resources.A << " "
+                      << resources.B << " "
+                      << resources.C << "\n";
+}
+
+
+void printTable() {
+    printTotalResources();
+
+
+    cout << "Available: ";
+    for (int i = 0; i < COLUMN; i++) {
+        cout << available[i] << " ";
+    }
+    cout << endl;
+
+    // ROW
+    cout << "Allocation - Maximum - Need" << endl;
+    for (int i = 0; i < ROW; i++) {
+
+        cout << "P" << i << ":  ";
+
+        // COLUMN
+        for (int j = 0; j < COLUMN; j++) {
+            cout << allocation[i][j] << " ";
+        }
+
+        cout << "-  ";
+        for (int k = 0; k < COLUMN; k++) {
+            cout << maximum[i][k] << " ";
+        }
+
+        cout << "  - ";
+        for (int n = 0; n < COLUMN; n++) {
+            cout << need[i][n] << " ";
+        }
+
+        cout << endl;
+    }
+}
+
 
 
 int main() {
 
-    PrintArrays();
-
+    readInputFile();
+    calculateNeed();
+    printTable();
+    initializeProcessQueue();
 
     return 0;
+
 }
