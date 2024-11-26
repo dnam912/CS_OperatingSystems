@@ -4,6 +4,8 @@
 #include <fstream>
 #include <sstream>
 
+#include <algorithm>
+
 using namespace std;
 
 int available[3] = {-1, -1, -1};

@@ -3,7 +3,8 @@
 #include <vector>
 #include <fstream>
 #include <sstream>
-#include <cstdio>
+
+#include <algorithm>
 
 using namespace std;
 
@@ -52,6 +53,8 @@ int readInputFile() {
     return 0;
 }
 
+// ========== ========== ========== ========== ========== //
+
 void calculateNeed() {
     for (int i = 0; i < ROW; i++) {
         for (int j = 0; j < COLUMN; j++) {
@@ -61,7 +64,7 @@ void calculateNeed() {
 }
 
 void initializeProcessQueue() {
-    for (int i = 0; i < 5; i++) {
+    for (int i = 0; i < ROW; i++) {
         // If process is in queue, it is not executed.
         process_queue.push_back(i); 
 
@@ -79,20 +82,48 @@ bool isExecutable(int process_number) {  // (available > need)
 }
 
 
+
 void executeProcess(int process_number) {
 
     cout << "Executing: P" << process_number << endl;
 
-    for (int i = 0; i < 3; i++) {
+    for (int i = 0; i < COLUMN; i++) {
         available[i] = allocation[process_number][i] + available[i];
         allocation[process_number][i] = 0;
     }
 
+    // Completely remove a specific element in vector
     process_queue.erase(
-        //vector<int> iterator it = process_queue;
         remove(process_queue.begin(), process_queue.end(), process_number), 
         process_queue.end()
     );
+}
+/**/
+
+void banker_algorithm() {
+
+    int repetition = -1;
+
+    while (process_queue.size() != 0) {
+
+        repetition = process_queue.size();
+        
+        for (int i = 0; i < process_queue.size(); i++) {
+            int process_number = process_queue[i];
+            if (isExecutable(process_number) == true) {
+                executeProcess(process_number);
+                break;
+            }
+        }
+
+        // No more process is left in queue
+        if (repetition == process_queue.size()) {
+            break;
+        }
+    }
+
+    //
+
 }
 
 
@@ -116,7 +147,6 @@ void printTotalResources() {
                       << resources.B << " "
                       << resources.C << "\n";
 }
-
 
 void printTable() {
     printTotalResources();
@@ -161,6 +191,7 @@ int main() {
     calculateNeed();
     printTable();
     initializeProcessQueue();
+    banker_algorithm();
 
     return 0;
 
