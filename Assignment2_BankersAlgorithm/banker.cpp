@@ -64,6 +64,8 @@ void calculateNeed() {
 }
 
 void initializeProcessQueue() {
+    cout << "Process in Queue: ";
+
     for (int i = 0; i < ROW; i++) {
         // If process is in queue, it is not executed.
         process_queue.push_back(i); 
@@ -74,11 +76,11 @@ void initializeProcessQueue() {
 
 bool isExecutable(int process_number) {  // (available > need)
     for (int i = 0; i < COLUMN; i++) {
-        if (available[i] > need[process_number][i]) {
-            return true;
+        if (available[i] < need[process_number][i]) {
+            return false;
         }
     }
-    return false;
+    return true;
 }
 
 
@@ -98,7 +100,6 @@ void executeProcess(int process_number) {
         process_queue.end()
     );
 }
-/**/
 
 void banker_algorithm() {
 
@@ -122,7 +123,11 @@ void banker_algorithm() {
         }
     }
 
-    //
+    if (process_queue.size() == 0) {
+        cout << "THE SYSTEM IS SAFE!" << endl;
+    } else {
+        cout << "THE SYSTEM IS NOT SAFE!" << endl;
+    }
 
 }
 
@@ -174,7 +179,7 @@ void printTable() {
             cout << maximum[i][k] << " ";
         }
 
-        cout << "  - ";
+        cout << " - ";
         for (int n = 0; n < COLUMN; n++) {
             cout << need[i][n] << " ";
         }
